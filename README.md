@@ -1,8 +1,8 @@
 # Kernel
 why i make this kernel? just for learning and i want make kernel for esp32 
 
-<hr>
 # First You need the cross compiler
+<hr>
 
 You need this dependencies
 ```-Compiler
