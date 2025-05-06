@@ -2,8 +2,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "idt.h"
-
 #if defined(_linux_)
 #error "kamu gak pake cross compiler, kamu mungkin akan mengalami beberapa masalah"
 #endif
@@ -12,7 +10,7 @@
 #error "butuh compiler dengan ix86-elf compiler"
 #endif
 
-extern void idt_init(void);
+extern void idt_init();
 
 enum vga_color {
 	VGA_COLOR_BLACK					=	0,	
@@ -71,7 +69,10 @@ void terminal_intialize(void)
 		for(size_t x = 0; x < VGA_WIDTH; x++)
 		{
 			const size_t index = y * VGA_WIDTH + x;
-			terminal_buffer[index] = vga_entry(' ',terminal_color);
+			if(index < VGA_HEIGHT * VGA_WIDTH)
+			{
+				terminal_buffer[index] = vga_entry(' ',terminal_color);
+			}
 		}
 	}
 }
@@ -157,6 +158,41 @@ void terminal_write_string(const char* str)
 
 void kernel_main(void)
 {
+	terminal_intialize();
 	idt_init();
-	// __asm__ volatile ("cli; hlt");
+
+	terminal_write_string("halo");
+
+	// uint8_t i = 10;
+	// uint8_t j = 0;
+	// char k = i / j;
+
+	// terminal_putchar(k);
+
+	
+
+	// int* ptr = (int*) 0xDEADBEEF; // An invalid address for testing
+    // *ptr = 42; // This will cause a page f/ault when dereferencing the invalid pointer
+
+	terminal_write_string("bisa bjir");
+
+	// __asm__ volatile("ud2");
+	// __asm__ volatile("int $0x6");
+	int numerator = 10;
+    int divisor = 0;
+    
+    __asm__ __volatile__(
+        "movl %0, %%eax;"      // Load numerator into EAX register
+        "movl %1, %%ebx;"      // Load divisor into EBX register
+        "div %%ebx;"           // Perform division (EAX / EBX)
+        :
+        : "r" (numerator), "r" (divisor)  // Input operands
+        : "%eax", "%ebx"       // Clobbered registers
+    );
+	terminal_write_string("owewoeirpjkjdsjkjf;sakj");
+
+	// while(1)
+	// {
+	// 	__asm__ volatile ("cli; hlt");
+	// }
 }

@@ -33,9 +33,12 @@ extern exception_handler
 
 %macro isr_err_stub 1
 isr_stub_%+%1:
+    push dword %1         ; push ISR number
     call exception_handler
+    add esp, 4            ; bersihkan argumen dari stack
     iret
 %endmacro
+
 
 %macro isr_no_err_stub 1
 isr_stub_%+%1:
@@ -45,38 +48,13 @@ isr_stub_%+%1:
 
 global isr_stub_table
 isr_stub_table:
-    dd isr_stub_0
-    dd isr_stub_1
-    dd isr_stub_2
-    dd isr_stub_3
-    dd isr_stub_4
-    dd isr_stub_5
-    dd isr_stub_6
-    dd isr_stub_7
-    dd isr_stub_8
-    dd isr_stub_9
-    dd isr_stub_10
-    dd isr_stub_11
-    dd isr_stub_12
-    dd isr_stub_13
-    dd isr_stub_14
-    dd isr_stub_15
-    dd isr_stub_16
-    dd isr_stub_17
-    dd isr_stub_18
-    dd isr_stub_19
-    dd isr_stub_20
-    dd isr_stub_21
-    dd isr_stub_22
-    dd isr_stub_23
-    dd isr_stub_24
-    dd isr_stub_25
-    dd isr_stub_26
-    dd isr_stub_27
-    dd isr_stub_28
-    dd isr_stub_29
-    dd isr_stub_30
-    dd isr_stub_31
+%assign i 0 
+%rep    32 
+    dd isr_stub_%+i ; use DQ instead if targeting 64-bit
+%assign i i+1 
+%endrep
+
+extern divide_by_zero_handler
 
 isr_no_err_stub 0
 isr_no_err_stub 1
@@ -124,7 +102,6 @@ _start:
 
 ; Function to load GDT
 load_gdt:
-    cli
     mov eax, [esp + 4]     ; Get address of GDT pointer
     lgdt [eax]             ; Load GDT
 
@@ -148,3 +125,7 @@ protected_mode_entry:
 
     ; Now we're in protected mode, we can call kernel_main
     call kernel_main
+
+.hlt
+    cli
+    hlt
