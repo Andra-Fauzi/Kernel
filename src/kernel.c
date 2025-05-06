@@ -2,6 +2,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "idt.h"
+
 #if defined(_linux_)
 #error "kamu gak pake cross compiler, kamu mungkin akan mengalami beberapa masalah"
 #endif
@@ -9,6 +11,8 @@
 #if defined(_i386_)
 #error "butuh compiler dengan ix86-elf compiler"
 #endif
+
+extern void idt_init(void);
 
 enum vga_color {
 	VGA_COLOR_BLACK					=	0,	
@@ -153,16 +157,6 @@ void terminal_write_string(const char* str)
 
 void kernel_main(void)
 {
-	terminal_intialize();
-	for(size_t i = 0;i<VGA_HEIGHT;i++)
-	{
-		terminal_write_string("andra\n");
-	}
-	for(size_t i = 0;i<VGA_HEIGHT / 2;i++)
-	{
-		terminal_write_string("bahren\n");
-	}
-
-	int i = 2 / 0;
-	// terminal_write_string("aja\n");
+	idt_init();
+	// __asm__ volatile ("cli; hlt");
 }

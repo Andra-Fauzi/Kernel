@@ -33,7 +33,7 @@ typedef struct {
     uint16_t iomap_base;
 } __attribute__((packed)) TSS;
 
-#define GDT_ENTRIES 5
+#define GDT_ENTRIES 6
 
 GDTEntry gdt_table[GDT_ENTRIES];
 GDTDescriptorPointer gdt_ptr;
@@ -65,8 +65,11 @@ void gdt_setup() {
     // User Code (optional): base=0, limit=4GB, DPL=3, access=0xFA
     set_gdt_entry(3, 0, 0xFFFFF, 0xFA, 0xC);
 
+     // User Data (optional): base=0, limit=4GB, DPL=3, access=0xFA
+    set_gdt_entry(4, 0, 0xFFFFF, 0xF2, 0xC);
+
     // TSS entry
-    set_gdt_entry(4, (uint32_t)&tss, sizeof(TSS) - 1, 0x89, 0x0);
+    set_gdt_entry(5, (uint32_t)&tss, sizeof(TSS) - 1, 0x89, 0x0);
 
     gdt_ptr.limit = sizeof(gdt_table) - 1;
     gdt_ptr.base  = (uint32_t)&gdt_table;
